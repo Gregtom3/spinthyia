@@ -45,3 +45,23 @@ To run any one of the compiled PYTHIA programs, simply run `bin/<NAME_OF_PROGRAM
 
 `./spinthyia/bin/dis`
 
+## Project Creation
+
+In the case where parallel computing (to be implemented in the future) is used to simulate many Monte Carlo events (and potentially event reconstruction), we provide a base project creation script `create_project.rb`. The goal of the script is to manage the output file locations of the executable being called and the required (and/or optional) input arguments of the executable. 
+
+The full list of arguments for the script can be viewed by
+
+```
+create_project.rb --help
+```
+
+The only required argument is the name of the executable being analyzed. By default, the output directory for the executables are in `./out`. If a project name is not provided to the script, it defaults to the name `tmp`. The runcard, if provided by the user, is saved in `./out/<PROJECT_NAME>/runcards` for logging. 
+
+Sample usage of the script is as follows
+
+```
+create_project.rb -e dis -n my_dis_project
+```
+
+
+
