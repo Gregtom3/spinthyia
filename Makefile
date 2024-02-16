@@ -33,6 +33,13 @@ $(BIN_DIR):
 $(BIN_DIR)/%: $(PROG_DIR)/%.cc $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -I$(INCLUDEDIR) -I$(STRINGSPINNERDIR) -o $@ $< $(OBJECTS) -L$(GFORTRAN) -lgfortran -L$(LIBDIR) -Wl,-rpath,$(LIBDIR) -lpythia8 -ldl $(ROOTLIBS)
 
+# Compile specific program
+# Usage: make prog PROG=name_of_program_without_extension
+prog: $(BIN_DIR)/$(PROG)
+
+$(BIN_DIR)/$(PROG): $(PROG_DIR)/$(PROG).cc $(OBJECTS)
+	$(CXX) $(CXXFLAGS) -I$(INCLUDEDIR) -I$(STRINGSPINNERDIR) -o $@ $< $(OBJECTS) -L$(GFORTRAN) -lgfortran -L$(LIBDIR) -Wl,-rpath,$(LIBDIR) -lpythia8 -ldl $(ROOTLIBS)
+
 # Rules for compiling mc3P0.o and def.o, ensuring they're built before any .cc files
 $(STRINGSPINNERDIR)/def.o: $(STRINGSPINNERDIR)/definitions.f90
 	$(FC) -c $< -o $@
