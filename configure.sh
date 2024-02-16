@@ -28,5 +28,9 @@ fi
 echo_blue "Configuring StringSpinner..."
 ./deps/stringspinner/configure $pythia_path
 
+# Add the StringSpinner PATH to the Makefile.inc
+echo_blue "Storing \$STRINGSPINNERDIR=${PWD}/deps/stringspinner in Makefile.inc"
+echo "STRINGSPINNERDIR=${PWD}/deps/stringspinner" >> Makefile.inc
+
 # Exit
 echo_blue "All done."
