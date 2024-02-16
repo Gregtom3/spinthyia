@@ -32,3 +32,16 @@ To compile a single program and save time (ex: `./spinthyia/pythia_programs/dis.
 make prog PROG=dis
 ```
 
+6. As an optional convenience, consider adding the `./spinthyia/bin` directory to your $PATH variable at startup (ex: .cshrc or .bashrc). For instance, for `.cshrc`, add the following line...
+
+```
+setenv PATH ${PATH}:/path/to/spinthyia/bin
+```
+
+
+# Usage
+
+To run any one of the compiled PYTHIA programs, simply run `bin/<NAME_OF_PROGRAM>`. One of the programs that comes native to StringSpinner is `dis.cc` which calculates the integrated Collins asymmetry. To run it (assuming it was compiled) ...
+
+`./spinthyia/bin/dis`
+
