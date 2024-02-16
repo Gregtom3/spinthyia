@@ -42,7 +42,7 @@ OptionParser.new do |opts|
   opts.on("-n", "--name NAME", "Project name. Names the directory containing output (ex: -n my_project).") { |n| options[:project_name] = n }
   opts.on("-e", "--executable EXECUTABLE", "Executable program name, located in ./bin (ex: -e dis).") { |e| options[:executable_name] = e }
   opts.on("-r", "--runcard RUNCARD", "RunCard name, located in ./runcards (ex: -r my_runcard.cmnd).") { |r| options[:run_card] = r }
-  opts.on("-n", "--events COUNT", Integer, "Number of events for the simulation (ex: -n 1000 ).") { |c| options[:events] = c }
+  opts.on("-c", "--events COUNT", Integer, "Number of events for the simulation (ex: -c 1000 ).") { |c| options[:events] = c }
   opts.on("-o", "--output-dir DIR", "Output directory (defaults to ./out)") { |o| options[:output_dir] = o }
   opts.on("-p", "--prefix PREFIX", "Prefix for files (default is no prefix)") { |p| options[:prefix] = p }
   opts.on("-s", "--seed SEED", "Random number seed (default is 0 or RANDOM for a random seed)") do |s|
