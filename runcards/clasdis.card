@@ -1,0 +1,51 @@
+# clasDIS Configuration Runcard
+# Uncomment any line to use a non-default value or to activate the option
+
+#--v 0                   # Verbose level
+#--trig 10               # Number of triggers (events)
+--beam 10.6             # Beam energy in GeV
+#--e 750 0.95           # Eprime min/max in GeV
+#--t 5.0 5.0            # Theta min/max in degrees
+--x 0.05 0.95           # x_b min/max
+--q 0.85 20.0           # Q2 min/max in GeV^2
+--w 4.0 50              # W^2 min/max in GeV^2
+#--z 0.3                # z=E_pi/nu min value
+#--zpos 0               # Target z position in cm
+#--xypos 0 0            # Beam x/y position in cm
+#--zwidth 0             # Width in z cm (zpos+/-zwidth/2)
+#--raster 0.02          # Raster diameter in cm
+#--nont                 # Do not write out the ntuple
+#--radgen               # Include radgen
+#--radtab               # Generate radgen table for SIDIS
+#--targ proton          # Target: proton (deuteron/neutron possible)
+#--pol 0                # Polarization: -100 to 100% target pol
+#--print 1000           # Print every nprint event
+#--printid 0            # Print tmp-file for id=321
+#--acceg1               # Acceptance for eg1 ON
+#--acce16               # Acceptance for e16 ON
+#--accclas12            # Acceptance for clas12 ON
+#--pid 0                # LUND_ID: 0-all,211-pip,3122-Lambda..
+#--path /home/avakian/w6 # Path
+#--norand               # Keep the old random number
+#--mstu                 # Set mstu(16)=2
+#--parj11 0.7           # Set PARJ(11) rhos
+#--parj12 0.5           # Set PARJ(12) k*s
+#--parj14 0.0           # Set PARJ(15) S0L1J1
+#--parj15 0.0           # Set PARJ(16) S1L1J0
+#--parj16 0.0           # Set PARJ(17) S1L1J1
+#--parj17 0.0           # Set PARJ(12) S1L1J2
+#--parj21 0.5           # Width of P_T
+#--parj33 0.3           # Set PARJ(33)
+#--parj41 1.2           # Default par in (1-z)^a
+#--parj42 0.58          # Par in exp(-bm_\perp^2/z)
+#--lst15 145            # Set the PDF set
+#--lst8 1               # Set QCD mechanism
+#--hermes               # Set HERMES JETSET variables
+#--lst37 0              # Set LST(37) 1-Ak Cahn+Sivers
+#--parl3 0.64           # Set PARL(3)
+#--HT 0                 # Higher twists on (LST(11)=iht)
+#--outform 1            # Output file with 1-all 2-GSIM 3-ga
+#--datf .TRUE.          # Write the output file
+#--nmax 0               # Maximum events in a file
+#--single .FALSE.       # /true gen fixed tracks
+#--docker .FALSE.       # Gen a single file clasdis.dat

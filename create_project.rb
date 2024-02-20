@@ -72,7 +72,7 @@ end
 
 project_dir = "#{options[:output_dir]}/#{options[:project_name]}"
 runcard_dir = "#{project_dir}/runcards"
-pythia_out_dir = "#{project_dir}/pythia_out"
+gen_out_dir = "#{project_dir}/gen"
 
 if Dir.exist?(project_dir) && !options[:force]
   puts_lightred("The directory #{project_dir} already exists.")
@@ -83,7 +83,7 @@ end
 
 # Create directories
 FileUtils.mkdir_p(runcard_dir)
-FileUtils.mkdir_p(pythia_out_dir)
+FileUtils.mkdir_p(gen_out_dir)
 
 # Copy the runCard with optional prefix
 prefix = options[:prefix].empty? ? "" : "#{options[:prefix]}_"
@@ -117,8 +117,22 @@ case executable_name
     required_params = [:events, :project_name, :run_card, :mode, :seed]
     check_missing_parameters(required_params, options)
     puts_lightblue("Running 'pythia8_to_gemc_lund'")
-    executable_line = "./bin/pythia8_to_gemc_lund #{pythia_out_dir} #{runcard_dir}/#{options[:run_card]} #{options[:events]} #{options[:mode]} #{options[:seed]}"
-  when ""
+    executable_line = "./bin/pythia8_to_gemc_lund #{gen_out_dir} #{runcard_dir}/#{options[:run_card]} #{options[:events]} #{options[:mode]} #{options[:seed]}"
+  when "clasdis"
+    required_params = [:events, :run_card]
+    check_missing_parameters(required_params, options)
+    puts_lightblue("Running 'clasdis'")
+    runcard_path = "#{runcard_dir}/#{options[:run_card]}"
+    # Build the command line from the runcard
+    runcard_options = File.readlines(runcard_path).map do |line|
+      # Split line at the first occurrence of "#" and take the first part
+      option_part = line.split("#", 2).first.strip
+      # Skip if the option_part is empty (i.e., the line was a comment or empty)
+      next if option_part.empty?
+      option_part
+    end.compact.join(" ") 
+
+    executable_line = "./deps/clasdis/clasdis #{runcard_options} --trig #{options[:events]} --path #{gen_out_dir}/"
   else
     puts "Executable '#{executable_name}' is not recognized."
     exit
