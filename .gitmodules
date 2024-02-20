@@ -1,3 +1,6 @@
 [submodule "deps/stringspinner"]
 	path = deps/stringspinner
 	url = https://gitlab.com/albikerbizi/stringspinner
+[submodule "deps/clasdis"]
+	path = deps/clasdis
+	url = https://github.com/JeffersonLab/clasdis
