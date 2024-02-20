@@ -106,32 +106,26 @@ def check_missing_parameters(required_params, options)
   end
 end
     
-# Function for handling compiled executables in ./spinthyia/bin
-def handle_executable(executable_name, options)
-  case executable_name
+# Run the executable
+executable_name = options[:executable_name]
+
+case executable_name
   when "dis"
-    puts_lightblue("Running 'dis' with no additional parameters.")
+    puts_lightblue("Running 'dis'")
     executable_line = "./bin/dis"
-      
-# TEMPLATE FOR REQUIRING PARAMETERS
-# Just so I remember how to do it later...
-#   when "dis_v2"
-#     required_params = [:events, :project_name, :run_card]
-#     check_missing_parameters(required_params, options)
-#     puts_lightblue("Running 'dis_v2' with #{options[:events]} events, project '#{options[:project_name]}', using run card '#{options[:run_card]}'.")
-#     executable_line = "./bin/dis_v2 #{options[:project_name]} #{options[:events]} #{options[:run_card]}"
+  when "pythia8_to_gemc_lund"
+    required_params = [:events, :project_name, :run_card, :mode, :seed]
+    check_missing_parameters(required_params, options)
+    puts_lightblue("Running 'pythia8_to_gemc_lund'")
+    executable_line = "./bin/pythia8_to_gemc_lund #{pythia_out_dir} #{runcard_dir}/#{options[:run_card]} #{options[:events]} #{options[:mode]} #{options[:seed]}"
+  when ""
   else
     puts "Executable '#{executable_name}' is not recognized."
     exit
-  end
-
-  # Run the executable with the desired options
-  run_executable(executable_line)
-    
 end
 
-# Run the executable
-handle_executable(options[:executable_name], options)
+# Run the executable with the desired options
+run_executable(executable_line)
 
 # Print out completion
 puts_lightgreen("\n\nProgram finished. Exiting.\n")
