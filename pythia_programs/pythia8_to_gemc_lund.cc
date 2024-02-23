@@ -181,7 +181,7 @@ int main(int argc, char* argv[]) {
     TLorentzVector scattered_lepton = get_tlorentzvector(event,5);
     TLorentzVector q = init_lepton - scattered_lepton;
     
-    nParticles = event.size();
+    nParticles = event.size() - 1; // -1 --> accounts for PID==90, which represents the "system"
     mass_target = init_target.M();
     beam_type  = event[1].id();
     beam_energy = init_lepton.E();
@@ -198,6 +198,7 @@ outFile << "\t" << std::left << std::setw(8) << nParticles << std::setw(8) << ma
         index = i;
         status      = event[i].isFinal(); // 1 --> propogate through GEANT
         particle_id = event[i].id();
+        if ( particle_id == 90 ){ continue; } // skip PID==90 (system)
         index_of_parent = event[i].mother1();
         index_of_first_daughter = event[i].daughter1();
         px = particle.Px();
@@ -218,20 +219,20 @@ outFile << "\t" << std::left << std::setw(8) << nParticles << std::setw(8) << ma
         if (std::abs(vz) < eps) vz = 0.0;
         
         // Output using fixed and setprecision
-        outFile << std::left << std::setw(4) << index 
-                << std::setw(8) << std::setprecision(5) << std::fixed << lifetime 
+        outFile << std::right << std::setw(4) << index 
+                << std::setw(8) << std::setprecision(1) << std::fixed << lifetime 
                 << std::setw(4) << status 
                 << std::setw(8) << particle_id 
                 << std::setw(8) << index_of_parent 
                 << std::setw(8) << index_of_first_daughter 
-                << std::setw(12) << std::setprecision(6) << std::fixed << px 
-                << std::setw(12) << std::setprecision(6) << std::fixed << py 
-                << std::setw(12) << std::setprecision(6) << std::fixed << pz 
-                << std::setw(12) << std::setprecision(6) << std::fixed << e 
-                << std::setw(12) << std::setprecision(6) << std::fixed << m 
-                << std::setw(12) << std::setprecision(6) << std::fixed << vx 
-                << std::setw(12) << std::setprecision(6) << std::fixed << vy 
-                << std::setw(12) << std::setprecision(6) << std::fixed << vz << "\n";
+                << std::setw(12) << std::setprecision(4) << std::fixed << px 
+                << std::setw(12) << std::setprecision(4) << std::fixed << py 
+                << std::setw(12) << std::setprecision(4) << std::fixed << pz 
+                << std::setw(12) << std::setprecision(4) << std::fixed << e 
+                << std::setw(12) << std::setprecision(4) << std::fixed << m 
+                << std::setw(12) << std::setprecision(4) << std::fixed << vx 
+                << std::setw(12) << std::setprecision(4) << std::fixed << vy 
+                << std::setw(12) << std::setprecision(4) << std::fixed << vz << "\n";
     }
   }
     
