@@ -26,7 +26,7 @@ int example_C_rhoplus(
     // Conditions for h_2 --> Diphoton
     rules.addParticleCondition({111, 213}); // h_2: parentPid must be 111, rho+ grandParentPid
     
-    // Enforce that h_1 has the same parent_ID as h_2
+    // Enforce that parentId h_1 == grandParentId h_2
     rules.addParentIdRelationship({0, 1, {RelationshipType::ParentIdAsOtherGrandParentId}});
     
     // Loop over LUND events
