@@ -45,6 +45,14 @@ To run any one of the compiled PYTHIA programs, simply run `bin/<NAME_OF_PROGRAM
 
 `./spinthyia/bin/dis`
 
+To execute any of the programs in `macros/` one must first set up the appropriate environment variables. To set up the environment variables needed for this project, please source the appropriate script for your shell:
+
+- If you are using Bash, Zsh, or another Bourne-like shell, run:
+  source environ.sh
+
+- If you are using Csh or Tcsh, run:
+  source environ.csh
+
 ## Project Creation
 
 In the case where parallel computing (to be implemented in the future) is used to simulate many Monte Carlo events (and potentially event reconstruction), we provide a base project creation script `create_project.rb`. The goal of the script is to manage the output file locations of the executable being called and the required (and/or optional) input arguments of the executable. 

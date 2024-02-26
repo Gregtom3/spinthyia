@@ -1,0 +1,4 @@
+#!/bin/csh
+
+setenv LD_LIBRARY_PATH "$PWD/lib:$LD_LIBRARY_PATH"
+setenv ROOT_INCLUDE_PATH "$PWD/src:$ROOT_INCLUDE_PATH"
