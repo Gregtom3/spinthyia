@@ -16,8 +16,8 @@ void DISTree::init(const std::string& filename, HadroniumAnalysisType analysisTy
     tree->Branch("y", &this->eventKinematics->y, "y/D");
     tree->Branch("Q2", &this->eventKinematics->Q2, "Q2/D");
     tree->Branch("W", &this->eventKinematics->W, "W/D");
-    tree->Branch("beam_polarization", &this->eventKinematics->beam_polarization, "bPol/I");
-    tree->Branch("target_polarization", &this->eventKinematics->target_polarization, "tPol/I");
+    tree->Branch("bPol", &this->eventKinematics->beam_polarization, "bPol/I");
+    tree->Branch("tPol", &this->eventKinematics->target_polarization, "tPol/I");
     // Branches for SingleHadronKinematics
     if (analysisType == HadroniumAnalysisType::SingleHadron) {
         doSingleHadron = true;

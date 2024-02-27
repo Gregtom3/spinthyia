@@ -31,8 +31,6 @@ options = {
   events: nil,
   output_dir: "#{Dir.pwd}/out",
   prefix: "",
-  seed: 0,
-  mode: 0,
   force: false,
   process_macros: nil
 }
@@ -46,10 +44,6 @@ OptionParser.new do |opts|
   opts.on("-c", "--events COUNT", Integer, "Number of events for the simulation (ex: -c 1000 ).") { |c| options[:events] = c }
   opts.on("-o", "--output-dir DIR", "Output directory (defaults to ./out)") { |o| options[:output_dir] = o }
   opts.on("-p", "--prefix PREFIX", "Prefix for files (default is no prefix)") { |p| options[:prefix] = p }
-  opts.on("-s", "--seed SEED", "Random number seed (default is 0 or RANDOM for a random seed)") do |s|
-    options[:seed] = s.upcase == 'RANDOM' ? rand(1000000) : s.to_i
-  end
-  opts.on("-m", "--mode MODE", Integer, "Mode integer (defaults to 0)") { |m| options[:mode] = m }
   opts.on("-f", "--force", "Automatically append to the output directory without prompt") { options[:force] = true }
   opts.on("-p", "--process-macros MACROS", "Comma-separated list of process macros to run after the executable (ex: -p macro1.C,macro2.C)") do |m|
     options[:process_macros] = m.split(',')
@@ -118,11 +112,14 @@ case executable_name
     executable_line = "./bin/dis"
   when "pythia8_to_gemc_lund"
     gen_out_dir_v2 = "#{gen_out_dir}/pythia8"
-    required_params = [:events, :project_name, :run_card, :mode, :seed]
+    required_params = [:events, :project_name, :run_card]
     check_missing_parameters(required_params, options)
     puts_lightblue("Running 'pythia8_to_gemc_lund'")
     FileUtils.mkdir_p(gen_out_dir_v2)
-    executable_line = "./bin/pythia8_to_gemc_lund #{gen_out_dir_v2} #{runcard_dir}/#{options[:run_card]} #{options[:events]} #{options[:mode]} #{options[:seed]}"
+    executable_line = "./bin/pythia8_to_gemc_lund #{gen_out_dir_v2} #{runcard_dir}/#{options[:run_card]} #{options[:events]/4} 0 #{rand(1000000)}\n"
+    executable_line += "./bin/pythia8_to_gemc_lund #{gen_out_dir_v2} #{runcard_dir}/#{options[:run_card]} #{options[:events]/4} 1 #{rand(1000000)}\n"
+    executable_line += "./bin/pythia8_to_gemc_lund #{gen_out_dir_v2} #{runcard_dir}/#{options[:run_card]} #{options[:events]/4} 2 #{rand(1000000)}\n"
+    executable_line += "./bin/pythia8_to_gemc_lund #{gen_out_dir_v2} #{runcard_dir}/#{options[:run_card]} #{options[:events]/4} 3 #{rand(1000000)}"
   when "clasdis"
     gen_out_dir_v2 = "#{gen_out_dir}/clasdis"
     required_params = [:events, :run_card]
@@ -158,7 +155,9 @@ def run_root_macros(macros, gen_out_dir_v2)
       next
     end
     puts_lightblue("Running ROOT macro: #{macro}")
-    system("root -l -b -q '#{macro_path}(\"#{gen_out_dir_v2}\",\"example.root\")'")
+    macro_filename_without_extension = File.basename(macro, File.extname(macro))
+    output_filename = "analysis_#{macro_filename_without_extension}.root"
+    system("root -l -b -q '#{macro_path}(\"#{gen_out_dir_v2}\",\"#{output_filename}\")'")
   end
 end
 

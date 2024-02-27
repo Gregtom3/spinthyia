@@ -24,7 +24,6 @@ EventKinematics KinematicsCalculator::CalculateEventKinematics() const {
     double y = (q * initialProton) / (initialElectron * initialProton);
     double x = Q2 / (2.0 * (q * initialProton));
     double W = sqrt(initialProton.M2() + 2.0 * initialProton*q - Q2);
-
     return EventKinematics{x, Q2, y, W, target_polarization, beam_polarization};
 }
 
