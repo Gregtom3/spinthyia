@@ -33,7 +33,8 @@ options = {
   prefix: "",
   seed: 0,
   mode: 0,
-  force: false
+  force: false,
+  process_macros: nil
 }
 
 OptionParser.new do |opts|
@@ -50,7 +51,9 @@ OptionParser.new do |opts|
   end
   opts.on("-m", "--mode MODE", Integer, "Mode integer (defaults to 0)") { |m| options[:mode] = m }
   opts.on("-f", "--force", "Automatically append to the output directory without prompt") { options[:force] = true }
-
+  opts.on("-p", "--process-macros MACROS", "Comma-separated list of process macros to run after the executable (ex: -p macro1.C,macro2.C)") do |m|
+    options[:process_macros] = m.split(',')
+  end
   opts.on_tail("-h", "--help", "Show this message") do
     puts opts
     exit
@@ -114,11 +117,14 @@ case executable_name
     puts_lightblue("Running 'dis'")
     executable_line = "./bin/dis"
   when "pythia8_to_gemc_lund"
+    gen_out_dir_v2 = "#{gen_out_dir}/pythia8"
     required_params = [:events, :project_name, :run_card, :mode, :seed]
     check_missing_parameters(required_params, options)
     puts_lightblue("Running 'pythia8_to_gemc_lund'")
-    executable_line = "./bin/pythia8_to_gemc_lund #{gen_out_dir} #{runcard_dir}/#{options[:run_card]} #{options[:events]} #{options[:mode]} #{options[:seed]}"
+    FileUtils.mkdir_p(gen_out_dir_v2)
+    executable_line = "./bin/pythia8_to_gemc_lund #{gen_out_dir_v2} #{runcard_dir}/#{options[:run_card]} #{options[:events]} #{options[:mode]} #{options[:seed]}"
   when "clasdis"
+    gen_out_dir_v2 = "#{gen_out_dir}/clasdis"
     required_params = [:events, :run_card]
     check_missing_parameters(required_params, options)
     puts_lightblue("Running 'clasdis'")
@@ -131,8 +137,8 @@ case executable_name
       next if option_part.empty?
       option_part
     end.compact.join(" ") 
-
-    executable_line = "./deps/clasdis/clasdis #{runcard_options} --trig #{options[:events]} --path #{gen_out_dir}/"
+    FileUtils.mkdir_p(gen_out_dir_v2)
+    executable_line = "./deps/clasdis/clasdis #{runcard_options} --trig #{options[:events]} --path #{gen_out_dir_v2}"
   else
     puts "Executable '#{executable_name}' is not recognized."
     exit
@@ -142,4 +148,26 @@ end
 run_executable(executable_line)
 
 # Print out completion
+puts_lightgreen("\n\nExecutable Finished.\n")
+
+def run_root_macros(macros, gen_out_dir_v2)
+  macros.each do |macro|
+    macro_path = "#{Dir.pwd}/macros/#{macro}"
+    unless File.exist?(macro_path)
+      puts_lightred("Macro #{macro} not found at #{macro_path}. Skipping...")
+      next
+    end
+    puts_lightblue("Running ROOT macro: #{macro}")
+    system("root -l -b -q '#{macro_path}(\"#{gen_out_dir_v2}\",\"example.root\")'")
+  end
+end
+
+# If process macros are specified, run them
+if options[:process_macros]
+  puts_lightgreen("\nRunning process macros...")
+  run_root_macros(options[:process_macros], gen_out_dir_v2)
+end
+
+# Print out completion
 puts_lightgreen("\n\nProgram finished. Exiting.\n")
+
