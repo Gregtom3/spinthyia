@@ -4,6 +4,11 @@
 
 #include <vector>
 
+enum class HadroniumAnalysisType {
+    SingleHadron,
+    DiHadron
+};
+
 struct EventKinematics {
     double x = 0.0;
     double Q2 = 0.0;
@@ -19,6 +24,7 @@ struct SingleHadronKinematics {
     double phi = 0.0;
     double Mh = 0.0;
     double xF = 0.0;
+    double Mx = 0.0;
 };
 
 struct DiHadronKinematics {
@@ -35,6 +41,7 @@ struct DiHadronKinematics {
     double xF1 = 0.0;
     double xF2 = 0.0;
     double xF  = 0.0;
+    double Mx  = 0.0;
 };
 
 #endif // KINEMATICS_STRUCTS_H

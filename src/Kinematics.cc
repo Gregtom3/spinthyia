@@ -40,7 +40,8 @@ std::vector<SingleHadronKinematics> KinematicsCalculator::CalculateSingleHadronK
             this->z(p), // z (fractional energy)
             this->phi_h(p), // Azimuthal angle
             p.M(), // Invariant mass
-            this->xF(p) // xF (Feynman x)
+            this->xF(p), // xF (Feynman x)
+            this->Mx(p)
         };
         
         allHadronKinematics.push_back(kinematics);
@@ -71,7 +72,8 @@ std::vector<DiHadronKinematics> KinematicsCalculator::CalculateDiHadronKinematic
             p.M(),
             this->xF(p1),
             this->xF(p2),
-            this->xF(p)
+            this->xF(p),
+            this->Mx(p)
         };
         
         allDiHadronKinematics.push_back(kinematics);
@@ -100,6 +102,11 @@ double KinematicsCalculator::phi_h(TLorentzVector p1, TLorentzVector p2) const {
 double KinematicsCalculator::z(TLorentzVector part) const {
     return (initialProton * part) / (initialProton * q);
 }
+
+double KinematicsCalculator::Mx(TLorentzVector part) const {
+    return (initialElectron + initialProton - finalElectron - part).M();
+}
+
 
 // Method to calculate phi_h for a single hadron
 double KinematicsCalculator::phi_h(TLorentzVector p) const {

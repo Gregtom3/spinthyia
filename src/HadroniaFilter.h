@@ -40,6 +40,10 @@ public:
     void addParentIdRelationship(const ParentIdRelationship& relationship) {
         parentIdRelationships.push_back(relationship);
     }
+    
+    bool isEmpty(){
+        return (particleConditions.size()==0 && parentIdRelationships.size()==0);
+    }
 };
 
 std::vector<std::vector<Hadronium>> filterHadronia(

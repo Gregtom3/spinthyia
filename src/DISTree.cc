@@ -3,14 +3,14 @@
 
 using namespace std;
 
-DISTree::DISTree(const char* filename, bool do_single_hadron, bool do_dihadron) {
-    // Warning if both flags are set, defaulting to only single hadron
-    if (do_single_hadron && do_dihadron) {
-        std::cout << "WARNING in DISTree: Only one flag, single or dihadron, can be set. Defaulting to only single hadron." << std::endl;
-        do_dihadron = false;
-    }
+DISTree::DISTree(const std::string& filename, HadroniumAnalysisType analysisType) {
+    this->init(filename, analysisType);
+}
 
-    file = new TFile(filename, "RECREATE");
+
+void DISTree::init(const std::string& filename, HadroniumAnalysisType analysisType){
+    
+    file = new TFile(filename.data(), "RECREATE");
     tree = new TTree("tree", "Kinematics Data Tree");
 
     // Branches for EventKinematics are always created
@@ -22,17 +22,18 @@ DISTree::DISTree(const char* filename, bool do_single_hadron, bool do_dihadron) 
     tree->Branch("target_polarization", &this->eventKinematics->target_polarization, "tPol/I");
     
     // Branches for SingleHadronKinematics
-    if (do_single_hadron) {
+    if (analysisType == HadroniumAnalysisType::SingleHadron) {
         doSingleHadron = true;
         tree->Branch("pt", &this->singleHadronKinematics->pt, "pt/D");
         tree->Branch("z", &this->singleHadronKinematics->z, "z/D");
         tree->Branch("phi", &this->singleHadronKinematics->phi, "phi/D");
         tree->Branch("Mh", &this->singleHadronKinematics->Mh, "Mh/D");
         tree->Branch("xF", &this->singleHadronKinematics->xF, "xF/D");
+        tree->Branch("Mx", &this->singleHadronKinematics->Mx, "Mx/D");
     }
 
     // Branches for DiHadronKinematics
-    if (do_dihadron) {
+    if (analysisType == HadroniumAnalysisType::DiHadron) {
         doDiHadron = true;
         tree->Branch("pt1", &this->diHadronKinematics->pt1, "pt1/D");
         tree->Branch("pt2", &this->diHadronKinematics->pt2, "pt2/D");
@@ -47,6 +48,7 @@ DISTree::DISTree(const char* filename, bool do_single_hadron, bool do_dihadron) 
         tree->Branch("xF1", &this->diHadronKinematics->xF1, "xF1/D");
         tree->Branch("xF2", &this->diHadronKinematics->xF2, "xF2/D");
         tree->Branch("xF", &this->diHadronKinematics->xF, "xF/D");
+        tree->Branch("Mx", &this->diHadronKinematics->Mx, "Mx/D");
     }
 }
 

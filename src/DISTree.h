@@ -11,10 +11,11 @@
 
 class DISTree {
 public:
-    // Constructor with flags to indicate whether to record single and di-hadron kinematics
-    DISTree(const char* filename, bool do_single_hadron = false, bool do_dihadron = false);
+    DISTree(){};
+    DISTree(const std::string& filename, HadroniumAnalysisType analysisType);
     ~DISTree();
 
+    void init(const std::string& filename, HadroniumAnalysisType analysisType);
     void SetEventKinematics(const EventKinematics& ek);
     void SetSingleHadronKinematics(const std::vector<SingleHadronKinematics>& shk);
     void SetDiHadronKinematics(const std::vector<DiHadronKinematics>& dhk);

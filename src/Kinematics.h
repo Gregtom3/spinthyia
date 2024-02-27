@@ -28,6 +28,7 @@ public:
     double phi_Rperp(TLorentzVector p1, TLorentzVector p2) const;
     double com_th(TLorentzVector P1, TLorentzVector P2) const;
     double z(TLorentzVector part) const;
+    double Mx(TLorentzVector part) const;
 };
 
 #endif // KINEMATICS_H
