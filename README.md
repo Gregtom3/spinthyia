@@ -71,6 +71,8 @@ Sample usage of the script is as follows
 create_project.rb -e dis -n my_dis_project
 ```
 
+## Tutorial / Code Explanation
+
 In the spirit of a comprehensive tutorial, run
 
 ```
