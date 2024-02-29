@@ -15,13 +15,14 @@
 class Hadronium {
 public:
     int pid; // Particle ID
+    int status; // Particle status
     double px, py, pz, e, m; // Physical properties
     std::vector<int> ids; // IDs for composite particles
     int parentId; // ID of the parent particle
     int parentPid; // PID of the parent particle
     int grandParentId; // ID of the grandparent particle
     int grandParentPid; // PID of the grandparent particle
-    Hadronium(int pid, double px, double py, double pz, double e, std::vector<int> ids = {}, int parentId = -1, int parentPid = -1, int grandParentId = -1, int grandParentPid = -1);
+    Hadronium(int pid, int status, double px, double py, double pz, double e, std::vector<int> ids = {}, int parentId = -1, int parentPid = -1, int grandParentId = -1, int grandParentPid = -1);
 };
 
 Hadronium combine_particles(const std::vector<Hadronium>& particles);

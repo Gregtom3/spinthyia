@@ -2,8 +2,8 @@
 #include <cmath>
 using namespace std;
 
-Hadronium::Hadronium(int pid, double px, double py, double pz, double e, std::vector<int> ids, int parentId, int parentPid, int grandParentId, int grandParentPid)
-    : pid(pid), px(px), py(py), pz(pz), e(e), ids(ids), parentId(parentId), parentPid(parentPid), grandParentId(grandParentId), grandParentPid(grandParentPid) {
+Hadronium::Hadronium(int pid, int status, double px, double py, double pz, double e, std::vector<int> ids, int parentId, int parentPid, int grandParentId, int grandParentPid)
+    : pid(pid), status(status), px(px), py(py), pz(pz), e(e), ids(ids), parentId(parentId), parentPid(parentPid), grandParentId(grandParentId), grandParentPid(grandParentPid) {
         if (ids.empty()) {
             this->ids.push_back(pid);
         }
@@ -12,25 +12,26 @@ Hadronium::Hadronium(int pid, double px, double py, double pz, double e, std::ve
 Hadronium combine_particles(const std::vector<Hadronium>& particles) {
     std::vector<int> combined_ids;
     double total_px = 0, total_py = 0, total_pz = 0, total_e = 0;
-    std::set<int> parentIds, parentPids, grandParentIds, grandParentPids;
-
+    std::set<int> statuses, parentIds, parentPids, grandParentIds, grandParentPids;
     for (const auto& particle : particles) {
         combined_ids.insert(combined_ids.end(), particle.ids.begin(), particle.ids.end());
         total_px += particle.px;
         total_py += particle.py;
         total_pz += particle.pz;
         total_e += particle.e;
+        statuses.insert(particle.status);
         parentIds.insert(particle.parentId);
         parentPids.insert(particle.parentPid);
         grandParentIds.insert(particle.grandParentId);
         grandParentPids.insert(particle.grandParentPid);
     }
+    int status   = parentIds.size() == 1 ? *statuses.begin() : -1;
     int parentId = parentIds.size() == 1 ? *parentIds.begin() : -1;
     int parentPid = parentIds.size() == 1 ? *parentPids.begin() : -1;
     int grandParentId = grandParentIds.size() == 1 ? *grandParentIds.begin() : -1;
     int grandParentPid = grandParentIds.size() == 1 ? *grandParentPids.begin() : -1;
     
-    return Hadronium(0, total_px, total_py, total_pz, total_e, combined_ids, parentId, parentPid, grandParentId, grandParentPid);
+    return Hadronium(0, status, total_px, total_py, total_pz, total_e, combined_ids, parentId, parentPid, grandParentId, grandParentPid);
 }
 
 // Finds all particles in an event with a specific PID
@@ -192,7 +193,7 @@ std::vector<Hadronium> convertLundEventToHadronia(LundEvent& event) {
         std::vector<int> ids = {lundParticle.index};
 
         // Create a Hadronium object with the extracted information
-        Hadronium h(pid, px, py, pz, e, ids, parentId, parentPid, grandParentId, grandParentPid);
+        Hadronium h(pid, status, px, py, pz, e, ids, parentId, parentPid, grandParentId, grandParentPid);
 
         // Add the Hadronium object to the vector
         hadronia.push_back(h);

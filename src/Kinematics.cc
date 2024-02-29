@@ -1,7 +1,6 @@
 #include "LundReader.h"
 #include "Kinematics.h"
 
-
 KinematicsCalculator::KinematicsCalculator(const LundEvent& event)
     : initialElectron(event.particles[0].px, event.particles[0].py, event.particles[0].pz, event.particles[0].e),
       initialProton(event.particles[1].px, event.particles[1].py, event.particles[1].pz, event.particles[1].e) {
@@ -24,7 +23,18 @@ EventKinematics KinematicsCalculator::CalculateEventKinematics() const {
     double y = (q * initialProton) / (initialElectron * initialProton);
     double x = Q2 / (2.0 * (q * initialProton));
     double W = sqrt(initialProton.M2() + 2.0 * initialProton*q - Q2);
-    return EventKinematics{x, Q2, y, W, target_polarization, beam_polarization};
+    TLorentzVector targetSpin(0,target_polarization,0,0);
+    TVector3 GNS = (q + initialProton).BoostVector();
+    targetSpin.Boost(-GNS);
+    double gamma = 2*initialProton.M()*x/sqrt(Q2);
+    double phi_S = targetSpin.Phi();
+    double epsilon = (1-y-gamma*gamma*y*y/4)/(1-y+y*y/2+gamma*gamma*y*y/4);
+    double depolA = y*y/(2*(1-epsilon));
+    double depolB = depolA * epsilon;
+    double depolC = depolA * sqrt(1-epsilon*epsilon);
+    double depolV = depolA * sqrt(2*epsilon*(1+epsilon));
+    double depolW = depolA * sqrt(2*epsilon*(1-epsilon));
+    return EventKinematics{x, Q2, y, W, phi_S, epsilon, gamma, depolA, depolB, depolC, depolV, depolW, target_polarization, beam_polarization};
 }
 
 std::vector<SingleHadronKinematics> KinematicsCalculator::CalculateSingleHadronKinematics(const std::vector<std::vector<Hadronium>>& hadronia) const {
@@ -40,7 +50,10 @@ std::vector<SingleHadronKinematics> KinematicsCalculator::CalculateSingleHadronK
             this->phi_h(p), // Azimuthal angle
             p.M(), // Invariant mass
             this->xF(p), // xF (Feynman x)
-            this->Mx(p)
+            this->Mx(p), // Mx (Missing mass)
+            hadron.parentPid,
+            hadron.grandParentPid,
+            hadron.status
         };
         
         allHadronKinematics.push_back(kinematics);
@@ -68,11 +81,18 @@ std::vector<DiHadronKinematics> KinematicsCalculator::CalculateDiHadronKinematic
             this->phi_h(p),
             this->phi_RT(p1,p2),
             this->phi_Rperp(p1,p2),
+            this->com_th(p1,p2),
             p.M(),
             this->xF(p1),
             this->xF(p2),
             this->xF(p),
-            this->Mx(p)
+            this->Mx(p),
+            hadronium.at(0).parentPid,
+            hadronium.at(0).grandParentPid,
+            hadronium.at(0).status,
+            hadronium.at(1).parentPid,
+            hadronium.at(1).grandParentPid,
+            hadronium.at(1).status
         };
         
         allDiHadronKinematics.push_back(kinematics);

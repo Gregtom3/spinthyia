@@ -16,6 +16,14 @@ void DISTree::init(const std::string& filename, HadroniumAnalysisType analysisTy
     tree->Branch("y", &this->eventKinematics->y, "y/D");
     tree->Branch("Q2", &this->eventKinematics->Q2, "Q2/D");
     tree->Branch("W", &this->eventKinematics->W, "W/D");
+    tree->Branch("phi_S", &this->eventKinematics->phi_S, "phi_S/D");
+    tree->Branch("epsilon", &this->eventKinematics->epsilon, "epsilon/D");
+    tree->Branch("gamma", &this->eventKinematics->gamma, "gamma/D");
+    tree->Branch("depolA", &this->eventKinematics->depolA, "depolA/D");
+    tree->Branch("depolB", &this->eventKinematics->depolB, "depolB/D");
+    tree->Branch("depolC", &this->eventKinematics->depolC, "depolC/D");
+    tree->Branch("depolV", &this->eventKinematics->depolV, "depolV/D");
+    tree->Branch("depolW", &this->eventKinematics->depolW, "depolW/D");
     tree->Branch("bPol", &this->eventKinematics->beam_polarization, "bPol/I");
     tree->Branch("tPol", &this->eventKinematics->target_polarization, "tPol/I");
     // Branches for SingleHadronKinematics
@@ -27,6 +35,9 @@ void DISTree::init(const std::string& filename, HadroniumAnalysisType analysisTy
         tree->Branch("Mh", &this->singleHadronKinematics->Mh, "Mh/D");
         tree->Branch("xF", &this->singleHadronKinematics->xF, "xF/D");
         tree->Branch("Mx", &this->singleHadronKinematics->Mx, "Mx/D");
+        tree->Branch("parentPid", &this->singleHadronKinematics->parentPid, "parentPid/I");
+        tree->Branch("grandParentPid", &this->singleHadronKinematics->grandParentPid, "grandParentPid/I");
+        tree->Branch("status", &this->singleHadronKinematics->status, "status/I");
     }
 
     // Branches for DiHadronKinematics
@@ -41,11 +52,18 @@ void DISTree::init(const std::string& filename, HadroniumAnalysisType analysisTy
         tree->Branch("phi_h", &this->diHadronKinematics->phi_h, "phi_h/D");
         tree->Branch("phi_RT", &this->diHadronKinematics->phi_RT, "phi_RT/D");
         tree->Branch("phi_Rperp", &this->diHadronKinematics->phi_Rperp, "phi_Rperp/D");
+        tree->Branch("th", &this->diHadronKinematics->th, "th/D");
         tree->Branch("Mh", &this->diHadronKinematics->Mh, "Mh/D");
         tree->Branch("xF1", &this->diHadronKinematics->xF1, "xF1/D");
         tree->Branch("xF2", &this->diHadronKinematics->xF2, "xF2/D");
         tree->Branch("xF", &this->diHadronKinematics->xF, "xF/D");
         tree->Branch("Mx", &this->diHadronKinematics->Mx, "Mx/D");
+        tree->Branch("parentPid1", &this->diHadronKinematics->parentPid1, "parentPid1/I");
+        tree->Branch("grandParentPid1", &this->diHadronKinematics->grandParentPid1, "grandParentPid1/I");
+        tree->Branch("status1", &this->diHadronKinematics->status1, "status1/I");
+        tree->Branch("parentPid2", &this->diHadronKinematics->parentPid2, "parentPid2/I");
+        tree->Branch("grandParentPid2", &this->diHadronKinematics->grandParentPid2, "grandParentPid2/I");
+        tree->Branch("status2", &this->diHadronKinematics->status2, "status2/I");
     }
 }
 
@@ -108,6 +126,7 @@ bool DISTree::checkCuts() const {
         else if (cut.variableName == "phi_h" && doDiHadron) value = diHadronKinematics->phi_h;
         else if (cut.variableName == "phi_RT" && doDiHadron) value = diHadronKinematics->phi_RT;
         else if (cut.variableName == "phi_Rperp" && doDiHadron) value = diHadronKinematics->phi_Rperp;
+        else if (cut.variableName == "th" && doDiHadron) value = diHadronKinematics->th;
         else if (cut.variableName == "xF1" && doDiHadron) value = diHadronKinematics->xF1;
         else if (cut.variableName == "xF2" && doDiHadron) value = diHadronKinematics->xF2;
         else if (cut.variableName == "xF" && doDiHadron) value = diHadronKinematics->xF;
