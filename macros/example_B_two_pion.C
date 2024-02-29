@@ -1,6 +1,6 @@
 #include "LundAnalysis.h"
 
-int example_B_two_pion(std::string pattern = "out/tmp2/gen/pythia8/",
+int example_B_two_pion(std::string pattern = "out/tmp4/gen/pythia8/",
                        std::string output_file = "example_B_out.root") {
     
     // Initialize LundAnalysis with the specific filename, output file, and kinematics settings

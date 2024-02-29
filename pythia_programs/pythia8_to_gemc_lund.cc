@@ -102,7 +102,7 @@ int main(int argc, char* argv[]) {
   if(beamPolarized) {
     switch(beamSpin) {
       case 1:  polStr = "0.0,0.0,-1.0"; break; // minus sign, since quark momentum is reversed after hard scattering
-      case -1: polStr = "0.0,0.0,1.0";  break; // minus sign, since quark momentum is reversed after hard scattering
+      case -1: polStr = "0.0,0.0,1.0";  break; 
     }
     std::vector<std::string> quarks = {"u", "d", "s", "ubar", "dbar", "sbar"};
     for(auto quark : quarks)
@@ -200,6 +200,11 @@ outFile << "\t" << std::left << std::setw(8) << nParticles << std::setw(8) << ma
         particle_id = event[i].id();
         if ( particle_id == 90 ){ continue; } // skip PID==90 (system)
         index_of_parent = event[i].mother1();
+        if ( index_of_parent > 0 ){
+            if ( event[index_of_parent].id() == 2212 && particle_id!=2212){ // protons can't decay! Ignore this particle
+                status = 0;
+            }
+        }
         index_of_first_daughter = event[i].daughter1();
         px = particle.Px();
         py = particle.Py();
