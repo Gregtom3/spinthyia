@@ -30,9 +30,9 @@ options = {
   run_card: nil,
   events: nil,
   output_dir: "#{Dir.pwd}/out",
-  prefix: "",
   force: false,
-  process_macros: nil
+  process_macros: nil,
+  batch: -1
 }
 
 OptionParser.new do |opts|
@@ -43,8 +43,8 @@ OptionParser.new do |opts|
   opts.on("-r", "--runcard RUNCARD", "RunCard name, located in ./runcards (ex: -r my_runcard.cmnd).") { |r| options[:run_card] = r }
   opts.on("-c", "--events COUNT", Integer, "Number of events for the simulation (ex: -c 1000 ).") { |c| options[:events] = c }
   opts.on("-o", "--output-dir DIR", "Output directory (defaults to ./out)") { |o| options[:output_dir] = o }
-  opts.on("-p", "--prefix PREFIX", "Prefix for files (default is no prefix)") { |p| options[:prefix] = p }
   opts.on("-f", "--force", "Automatically append to the output directory without prompt") { options[:force] = true }
+  opts.on("-b", "--batch #", "Batch number (for HPC)") { |b| options[:batch] = b.to_i }
   opts.on("-p", "--process-macros MACROS", "Comma-separated list of process macros to run after the executable (ex: -p macro1.C,macro2.C)") do |m|
     options[:process_macros] = m.split(',')
   end
@@ -82,11 +82,9 @@ end
 FileUtils.mkdir_p(runcard_dir)
 FileUtils.mkdir_p(gen_out_dir)
 
-# Copy the runCard with optional prefix
-prefix = options[:prefix].empty? ? "" : "#{options[:prefix]}_"
 
 if options[:run_card]
-    run_card_dest = "#{runcard_dir}/#{prefix}#{options[:run_card]}"
+    run_card_dest = "#{runcard_dir}/#{options[:run_card]}"
     FileUtils.cp("#{Dir.pwd}/runcards/#{options[:run_card]}", run_card_dest)
 end
 
@@ -116,10 +114,10 @@ case executable_name
     check_missing_parameters(required_params, options)
     puts_lightblue("Running 'pythia8_to_gemc_lund'")
     FileUtils.mkdir_p(gen_out_dir_v2)
-    executable_line = "./bin/pythia8_to_gemc_lund #{gen_out_dir_v2} #{runcard_dir}/#{options[:run_card]} #{options[:events]/4} 0 #{rand(1000000)}\n"
-    executable_line += "./bin/pythia8_to_gemc_lund #{gen_out_dir_v2} #{runcard_dir}/#{options[:run_card]} #{options[:events]/4} 1 #{rand(1000000)}\n"
-    executable_line += "./bin/pythia8_to_gemc_lund #{gen_out_dir_v2} #{runcard_dir}/#{options[:run_card]} #{options[:events]/4} 2 #{rand(1000000)}\n"
-    executable_line += "./bin/pythia8_to_gemc_lund #{gen_out_dir_v2} #{runcard_dir}/#{options[:run_card]} #{options[:events]/4} 3 #{rand(1000000)}"
+    executable_line = "./bin/pythia8_to_gemc_lund #{gen_out_dir_v2} #{runcard_dir}/#{options[:run_card]} #{options[:events]/4} 0 #{rand(1000000)}" + (options[:batch]==-1 ? "" : " #{options[:batch]}")
+    executable_line += "\n./bin/pythia8_to_gemc_lund #{gen_out_dir_v2} #{runcard_dir}/#{options[:run_card]} #{options[:events]/4} 1 #{rand(1000000)}" + (options[:batch]==-1 ? "" : " #{options[:batch]}")
+    executable_line += "\n./bin/pythia8_to_gemc_lund #{gen_out_dir_v2} #{runcard_dir}/#{options[:run_card]} #{options[:events]/4} 2 #{rand(1000000)}" + (options[:batch]==-1 ? "" : " #{options[:batch]}")
+    executable_line += "\n./bin/pythia8_to_gemc_lund #{gen_out_dir_v2} #{runcard_dir}/#{options[:run_card]} #{options[:events]/4} 3 #{rand(1000000)}" + (options[:batch]==-1 ? "" : " #{options[:batch]}")
   when "clasdis"
     gen_out_dir_v2 = "#{gen_out_dir}/clasdis"
     required_params = [:events, :run_card]
@@ -147,7 +145,7 @@ run_executable(executable_line)
 # Print out completion
 puts_lightgreen("\n\nExecutable Finished.\n")
 
-def run_root_macros(macros, gen_out_dir_v2)
+def run_root_macros(project_dir, macros, gen_out_dir_v2, batch)
   macros.each do |macro|
     macro_path = "#{Dir.pwd}/macros/#{macro}"
     unless File.exist?(macro_path)
@@ -156,15 +154,20 @@ def run_root_macros(macros, gen_out_dir_v2)
     end
     puts_lightblue("Running ROOT macro: #{macro}")
     macro_filename_without_extension = File.basename(macro, File.extname(macro))
-    output_filename = "analysis_#{macro_filename_without_extension}.root"
-    system("root -l -b -q '#{macro_path}(\"#{gen_out_dir_v2}\",\"#{output_filename}\")'")
+    if batch >= 0 # Use wildcard with batch
+        output_filename = "#{project_dir}/batch#{batch}_analysis_#{macro_filename_without_extension}.root"
+        system("root -l -b -q '#{macro_path}(\"#{gen_out_dir_v2}/batch#{batch}*.\",\"#{output_filename}\")'")
+    else
+        output_filename = "#{project_dir}/analysis_#{macro_filename_without_extension}.root"
+        system("root -l -b -q '#{macro_path}(\"#{gen_out_dir_v2}/*\",\"#{output_filename}\")'")
+    end
   end
 end
 
 # If process macros are specified, run them
 if options[:process_macros]
   puts_lightgreen("\nRunning process macros...")
-  run_root_macros(options[:process_macros], gen_out_dir_v2)
+  run_root_macros(project_dir, options[:process_macros], gen_out_dir_v2, options[:batch])
 end
 
 # Print out completion
