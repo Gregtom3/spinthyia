@@ -2,6 +2,7 @@
 #include "StringSpinner.h"
 #include "TLorentzVector.h"
 #include "TVector3.h"
+#include "TString.h"
 
 #include <fstream>
 #include <iomanip> 
@@ -19,9 +20,24 @@ TLorentzVector get_tlorentzvector(Event& event, int index){
     return vec2;
 }
 
+// Function to check if any ancestor particle was a diquark
+bool hasDiquarkAncestor(Event& event, int currentParticleIndex) {
+    int parentIndex = event[currentParticleIndex].mother1();
+    // Base case: no parent
+    if (parentIndex <= 0) {
+        return false;
+    }
+    
+    if (event[parentIndex].isDiquark()) {
+        return true;
+    }
+    // Recursive call to check the next ancestor in the lineage
+    return hasDiquarkAncestor(event, parentIndex);
+}
+
 int main(int argc, char* argv[]) {
   if (argc < 6) {
-    std::cout << "Usage: " << argv[0] << " <path/to/output> <path/to/runcard.cmnd> <nEvent> <mode> <seed>" << std::endl;
+    std::cout << "Usage: " << argv[0] << " <path/to/output> <path/to/runcard.cmnd> <nEvent> <mode> <seed> <optional: batch>" << std::endl;
     return 1;
   }
   std::string outputFilePath = argv[1];
@@ -29,9 +45,14 @@ int main(int argc, char* argv[]) {
   int nEvent = std::atoi(argv[3]);
   int mode   = std::atoi(argv[4]);
   int seed   = std::atoi(argv[5]);
+  int batch  = -1;
+  std::string baseFilePrefixPrefix="";
+  if (argc == 7){
+      batch = std::atoi(argv[6]);
+      baseFilePrefixPrefix=Form("batch%d.",batch);
+  }
     
-    
-  const std::string baseFilePrefix = "stringspinner.pythia8.gemc.lund."; // File prefix
+  const std::string baseFilePrefix = baseFilePrefixPrefix+"stringspinner.pythia8.gemc.lund."; // File prefix
   std::string filePrefix;
    
   switch(mode){
@@ -137,11 +158,12 @@ int main(int argc, char* argv[]) {
     
   // Particle variables for LUND GEMC
   int index;
-  float lifetime = 0.0;
+  float lifetime;
   int status;
   int particle_id;
   int index_of_parent;
   int index_of_first_daughter;
+  int index_of_grandparent;
   float px;
   float py;
   float pz;
@@ -200,11 +222,14 @@ outFile << "\t" << std::left << std::setw(8) << nParticles << std::setw(8) << ma
         particle_id = event[i].id();
         if ( particle_id == 90 ){ continue; } // skip PID==90 (system)
         index_of_parent = event[i].mother1();
-        if ( index_of_parent > 0 ){
-            if ( event[index_of_parent].id() == 2212 && particle_id!=2212){ // protons can't decay! Ignore this particle
-                status = 0;
-            }
+        
+        // Use the recursive function to check for an ancestor diquark
+        if (hasDiquarkAncestor(event, i)) {
+            lifetime = -1.0; // If true, set lifetime to -1
+        }else{
+            lifetime = 1.0;
         }
+        
         index_of_first_daughter = event[i].daughter1();
         px = particle.Px();
         py = particle.Py();

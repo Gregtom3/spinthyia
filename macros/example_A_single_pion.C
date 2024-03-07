@@ -1,6 +1,6 @@
 #include "LundAnalysis.h"
 
-int example_A_single_pion(std::string pattern = "out/tmp6/gen/pythia8/",
+int example_A_single_pion(std::string pattern = "out/tmp/gen/pythia8/*.dat",
                           std::string output_file = "example_A_out.root") {
     
     LundAnalysis analysis(pattern, output_file, HadroniumAnalysisType::SingleHadron, 1);

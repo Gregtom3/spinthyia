@@ -6,6 +6,10 @@
 #include <vector>
 #include <sstream>
 
+enum class AcceptanceType {
+    ALL,
+    CLAS12
+};
 // Struct to store Lund particle information
 struct LundParticle {
     int index;

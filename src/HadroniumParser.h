@@ -35,8 +35,8 @@ std::vector<Hadronium> reconstruct_from_group(const std::vector<Hadronium>& even
 std::vector<std::vector<Hadronium>> combine_lists(const std::vector<std::vector<Hadronium>>& x, const std::vector<std::vector<Hadronium>>& y);
 bool has_shared_ids(const std::vector<Hadronium>& combination);
 std::vector<std::vector<Hadronium>> filter_duplicate_combinations(const std::vector<std::vector<Hadronium>>& combinations);
-std::vector<std::vector<Hadronium>> reconstruct_hadronia(LundEvent& event, const std::string& criteria);
-std::vector<Hadronium> convertLundEventToHadronia(LundEvent& event);
+std::vector<std::vector<Hadronium>> reconstruct_hadronia(LundEvent& event, const std::string& criteria, AcceptanceType acc);
+std::vector<Hadronium> convertLundEventToHadronia(LundEvent& event, AcceptanceType acc);
 void printHadronia(const std::vector<std::vector<Hadronium>>& hadroniums);
 
 #endif // HADRONIUM_PARSER_H

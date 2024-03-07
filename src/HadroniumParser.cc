@@ -134,8 +134,8 @@ std::vector<std::vector<Hadronium>> filter_duplicate_combinations(const std::vec
     return unique_combinations;
 }
 
-std::vector<std::vector<Hadronium>> reconstruct_hadronia(LundEvent& event, const std::string& criteria) {
-    auto hadronia = convertLundEventToHadronia(event);
+std::vector<std::vector<Hadronium>> reconstruct_hadronia(LundEvent& event, const std::string& criteria, AcceptanceType acc) {
+    auto hadronia = convertLundEventToHadronia(event, acc);
     std::regex pattern("\\(([^()]+)\\)");
     std::vector<std::vector<Hadronium>> reconstructed;
     auto begin = std::sregex_iterator(criteria.begin(), criteria.end(), pattern);
@@ -166,7 +166,7 @@ std::vector<std::vector<Hadronium>> reconstruct_hadronia(LundEvent& event, const
 }
 
 
-std::vector<Hadronium> convertLundEventToHadronia(LundEvent& event) {
+std::vector<Hadronium> convertLundEventToHadronia(LundEvent& event, AcceptanceType acc) {
     std::vector<Hadronium> hadronia;
     std::vector<LundParticle> lundParticles = event.particles;
     for (const auto& lundParticle : lundParticles) {
@@ -174,10 +174,19 @@ std::vector<Hadronium> convertLundEventToHadronia(LundEvent& event) {
         int pid = lundParticle.particle_id;
         int status = lundParticle.status;
         if (status != 1) continue; // Ignore non-final state particles
+        float lifetime = lundParticle.lifetime;
+        if (lifetime == -1.0) continue; // Ignore final state particles with diquark ancestor
         double px = lundParticle.px;
         double py = lundParticle.py;
         double pz = lundParticle.pz;
+        double p = sqrt(px*px + py*py + pz*pz);
         double e = lundParticle.e;
+        double theta = 180/3.14159265*acos(pz /  p );
+        if (acc == AcceptanceType::CLAS12){ // Acceptance of the CLAS12 Spectrometer
+            if (theta < 5 || theta > 35) continue;
+            if (abs(pid)==211 && p < 1.25) continue;
+            if (pid==22 && e < 0.2) continue;
+        }
         double m = lundParticle.m;
         int parentId = lundParticle.index_of_parent;
         int parentPid = 0;

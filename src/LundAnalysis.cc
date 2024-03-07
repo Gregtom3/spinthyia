@@ -1,17 +1,12 @@
 #include "LundAnalysis.h"
-//#include "Riostream.h"
+#include "Riostream.h"
 
 R__LOAD_LIBRARY(Spinthyia)
-
+    
 LundAnalysis::LundAnalysis(const std::string& pattern, const std::string& outputFilename, HadroniumAnalysisType analysisType, int verbosity)
 : outputFilename(outputFilename), analysisType(analysisType), verbosity(verbosity) {
-    if (fs::is_directory(pattern)) {
-        for (const auto& entry : fs::directory_iterator(pattern))
-            if (!fs::is_directory(entry.path())) // Avoid adding directories
-                filenames.push_back(entry.path().string());
-    } else {
-        filenames.push_back(pattern); // Assuming a single file
-    }
+    // Get the std::vector<string> filenames (capable of handling wildcards)
+    filenames = findMatchingFiles(pattern);
     // Initialize distree once, assuming same outputFilename and analysisType for all files
     distree.init(outputFilename, analysisType);
 }
@@ -43,8 +38,12 @@ void LundAnalysis::run() {
     distree.Write();
 }
 
+void LundAnalysis::setCLAS12() {
+    acc = AcceptanceType::CLAS12;
+}
+
 void LundAnalysis::processEvent(LundEvent& event) {
-    std::vector<std::vector<Hadronium>> hadronia = reconstruct_hadronia(event, criteria);
+    std::vector<std::vector<Hadronium>> hadronia = reconstruct_hadronia(event, criteria, acc);
     if (!rules.isEmpty()) {
         hadronia = filterHadronia(hadronia, rules);
     }
@@ -53,4 +52,33 @@ void LundAnalysis::processEvent(LundEvent& event) {
     if (numPassed < 20 && verbosity > 0)
         printHadronia(hadronia);
     numPassed++;
+}
+
+std::vector<std::string> LundAnalysis::findMatchingFiles(const std::string& pattern) {
+    // Split the pattern into directory path and file pattern
+    fs::path patternPath(pattern);
+    fs::path dirPath = patternPath.parent_path();
+    std::string filenamePattern = patternPath.filename().string();
+
+    // Convert wildcard pattern to regex
+    // This is a simple conversion: replace '*' with ".*"
+    std::string regexPattern = std::regex_replace(filenamePattern, std::regex("\\*"), ".*");
+    std::regex finalPattern(regexPattern, std::regex::basic);
+
+    std::vector<std::string> matchingFiles;
+
+    // Check if directory exists
+    if (!fs::exists(dirPath) || !fs::is_directory(dirPath)) {
+        std::cerr << "Directory does not exist: " << dirPath << std::endl;
+        return matchingFiles;
+    }
+
+    // Iterate over files in the directory and match against the pattern
+    for (const auto& entry : fs::directory_iterator(dirPath)) {
+        if (fs::is_regular_file(entry) && std::regex_match(entry.path().filename().string(), finalPattern)) {
+            matchingFiles.push_back(entry.path().string());
+        }
+    }
+
+    return matchingFiles;
 }

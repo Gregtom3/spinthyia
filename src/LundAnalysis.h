@@ -23,7 +23,8 @@ public:
     void setFilterRules(const FilterRules& rules);
     void addKinematicCut(const KinematicCut& cut);
     void run();
-
+    void setCLAS12();
+    
 private:
     int numPassed = 0;
     int eventCount = 0;
@@ -34,7 +35,9 @@ private:
     std::string criteria;
     HadroniumAnalysisType analysisType;
     FilterRules rules;
+    AcceptanceType acc = AcceptanceType::ALL;
     void processEvent(LundEvent& event);
+    std::vector<std::string> findMatchingFiles(const std::string& pattern);
 };
 
 #endif // LUNDANALYSIS_H

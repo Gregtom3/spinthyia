@@ -1,6 +1,6 @@
 #include "LundAnalysis.h"
 
-int example_C_rhoplus(std::string pattern = "out/tmp3/gen/pythia8/",
+int example_C_rhoplus(std::string pattern = "out/tutorial/gen/pythia8/*.dat",
                       std::string output_file = "example_C_out.root") {
     
     // Initialize LundAnalysis with the specific filename, output file, and kinematics settings
