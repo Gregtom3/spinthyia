@@ -118,6 +118,16 @@ case executable_name
     executable_line += "\n./bin/pythia8_to_gemc_lund #{gen_out_dir_v2} #{runcard_dir}/#{options[:run_card]} #{options[:events]/4} 1 #{rand(1000000)}" + (options[:batch]==-1 ? "" : " #{options[:batch]}")
     executable_line += "\n./bin/pythia8_to_gemc_lund #{gen_out_dir_v2} #{runcard_dir}/#{options[:run_card]} #{options[:events]/4} 2 #{rand(1000000)}" + (options[:batch]==-1 ? "" : " #{options[:batch]}")
     executable_line += "\n./bin/pythia8_to_gemc_lund #{gen_out_dir_v2} #{runcard_dir}/#{options[:run_card]} #{options[:events]/4} 3 #{rand(1000000)}" + (options[:batch]==-1 ? "" : " #{options[:batch]}")
+  when "pythia8_to_ttree"
+    gen_out_dir_v2 = "#{gen_out_dir}/pythia8"
+    required_params = [:events, :project_name, :run_card]
+    check_missing_parameters(required_params, options)
+    puts_lightblue("Running 'pythia8_to_ttree'")
+    FileUtils.mkdir_p(gen_out_dir_v2)
+    executable_line = "./bin/pythia8_to_ttree #{gen_out_dir_v2} #{runcard_dir}/#{options[:run_card]} #{options[:events]/4} 0 #{rand(1000000)}" + (options[:batch]==-1 ? "" : " #{options[:batch]}")
+    executable_line += "\n./bin/pythia8_to_ttree #{gen_out_dir_v2} #{runcard_dir}/#{options[:run_card]} #{options[:events]/4} 1 #{rand(1000000)}" + (options[:batch]==-1 ? "" : " #{options[:batch]}")
+    executable_line += "\n./bin/pythia8_to_ttree #{gen_out_dir_v2} #{runcard_dir}/#{options[:run_card]} #{options[:events]/4} 2 #{rand(1000000)}" + (options[:batch]==-1 ? "" : " #{options[:batch]}")
+    executable_line += "\n./bin/pythia8_to_ttree #{gen_out_dir_v2} #{runcard_dir}/#{options[:run_card]} #{options[:events]/4} 3 #{rand(1000000)}" + (options[:batch]==-1 ? "" : " #{options[:batch]}")
   when "clasdis"
     gen_out_dir_v2 = "#{gen_out_dir}/clasdis"
     required_params = [:events, :run_card]
@@ -135,7 +145,7 @@ case executable_name
     FileUtils.mkdir_p(gen_out_dir_v2)
     executable_line = "./deps/clasdis/clasdis #{runcard_options} --trig #{options[:events]} --path #{gen_out_dir_v2}"
   else
-    puts "Executable '#{executable_name}' is not recognized."
+    puts "ERROR in create_project.rb ... Executable '#{executable_name}' is not recognized."
     exit
 end
 
@@ -156,10 +166,12 @@ def run_root_macros(project_dir, macros, gen_out_dir_v2, batch)
     macro_filename_without_extension = File.basename(macro, File.extname(macro))
     if batch >= 0 # Use wildcard with batch
         output_filename = "#{project_dir}/batch#{batch}_analysis_#{macro_filename_without_extension}.root"
-        system("root -l -b -q '#{macro_path}(\"#{gen_out_dir_v2}/batch#{batch}*.\",\"#{output_filename}\")'")
+        system("root -l -b -q '#{macro_path}(\"#{gen_out_dir_v2}/batch#{batch}_*\",\"#{output_filename}\")'")
+        system("rm #{gen_out_dir_v2}/batch#{batch}_*")
     else
         output_filename = "#{project_dir}/analysis_#{macro_filename_without_extension}.root"
         system("root -l -b -q '#{macro_path}(\"#{gen_out_dir_v2}/*\",\"#{output_filename}\")'")
+        system("rm #{gen_out_dir_v2}/*")
     end
   end
 end
