@@ -137,6 +137,9 @@ final_slurm_script = <<-SLURM
 # Command to merge ROOT files
 hadd -f #{project_dir}/analysis.root #{project_dir}/batch*.root
 
+# Remove all .root files apart from the first one, just to save it
+find #{project_dir} -name "batch*.root" | grep -v "batch0_*.root" | xargs rm -f
+
 SLURM
 
 # Save the final Slurm script to a file
