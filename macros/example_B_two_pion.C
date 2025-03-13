@@ -1,7 +1,7 @@
 #include "LundAnalysis.h"
 
-int example_B_two_pion(//std::string pattern = "out/tmp/gen/pythia8/*.dat",
-                       std::string pattern = "out/test_parallel_v3/gen/pythia8/stringspinner.pythia8.gemc.lund.LU.1.0000.dat",
+int example_B_two_pion(std::string pattern = "./string*.root",
+                       //std::string pattern = "out/test_parallel_v3/gen/pythia8/stringspinner.pythia8.gemc.lund.LU.1.0000.dat",
                        std::string output_file = "example_B_out.root") {
     
     // Initialize LundAnalysis with the specific filename, output file, and kinematics settings

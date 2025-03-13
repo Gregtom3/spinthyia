@@ -1,10 +1,10 @@
 #include "Pythia8/Pythia.h"
 #include "StringSpinner.h"
-
+ 
 using namespace Pythia8;
 
-int main() {
-
+int main() 
+{
   Pythia pythia;
   Event& event = pythia.event;
   auto fhooks = std::make_shared<SimpleStringSpinner>();

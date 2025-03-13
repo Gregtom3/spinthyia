@@ -49,7 +49,7 @@ int main(int argc, char* argv[]) {
   std::string baseFilePrefixPrefix="";
   if (argc == 7){
       batch = std::atoi(argv[6]);
-      baseFilePrefixPrefix=Form("batch%d.",batch);
+      baseFilePrefixPrefix=Form("batch%d_",batch);
   }
     
   const std::string baseFilePrefix = baseFilePrefixPrefix+"stringspinner.pythia8.gemc.lund."; // File prefix
@@ -74,7 +74,7 @@ int main(int argc, char* argv[]) {
   }
     
   int fileIndex = 0; // Index for file naming
-  int eventsPerFile = 10000; // Number of events per file
+  int eventsPerFile = 100000; // Number of events per file
     
     
   Pythia pythia;

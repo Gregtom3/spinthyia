@@ -17,7 +17,10 @@ int example_C_rhoplus(std::string pattern = "out/tutorial/gen/pythia8/*.dat",
 
     // Apply the custom filtering rules
     analysis.setFilterRules(rules);
-    
+        
+    // Add an acceptance for final state particles
+    analysis.setCLAS12();
+  
     // Add a z cut
     analysis.addKinematicCut(KinematicCut("z", KinematicCut::CutType::MIN, 0.1)); // z > 0.1
 

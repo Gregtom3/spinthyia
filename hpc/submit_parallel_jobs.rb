@@ -25,34 +25,104 @@ def run_executable(exe)
 end
 
 
-# Define options for the parallel submission script
 options = {
-  project_name: nil,
-  executable_name: nil,
-  run_card: nil,
-  events: nil,
-  output_dir: "#{Dir.pwd}/out",
-  process_macros: nil,
-  num_batches: 1 # Default to 1 batch if not specified
+  run_card: './runcards/stringSpinSim.card',
+  events: 1000,
+  output_dir: './out/',
+  num_batches: 1
 }
+
+# Check if the executable exists in the specified directory
+def valid_executable?(file)
+  File.exist?("./pythia_programs/#{file}")
+end
+
+# Check if a file or directory exists
+def valid_path?(path)
+  File.exist?(path)
+end
 
 OptionParser.new do |opts|
   opts.banner = "Usage: submit_parallel_jobs.rb [options]"
 
-  # Include all the options from create_project.rb
-  # Add or modify options as necessary for your script
-  opts.on("-n", "--name NAME", "Project name.") { |n| options[:project_name] = n }
-  opts.on("-e", "--executable EXECUTABLE", "Executable name.") { |e| options[:executable_name] = e }
-  opts.on("-r", "--runcard RUNCARD", "RunCard name.") { |r| options[:run_card] = r }
-  opts.on("-c", "--events COUNT", Integer, "Number of events.") { |c| options[:events] = c }
-  opts.on("-o", "--output-dir DIR", "Output directory.") { |o| options[:output_dir] = o }
-  opts.on("-p", "--process-macros MACROS", "Process macros.") { |p| options[:process_macros] = p }
-  opts.on("-b", "--num-batches BATCHES", Integer, "Number of batches for parallel processing.") { |b| options[:num_batches] = b }
+  opts.on("-n", "--name NAME", "Project name.") do |n|
+    if n.nil? || n.strip.empty?
+      puts "Error: Project name (-n) cannot be empty."
+      puts opts
+      exit
+    else
+      options[:project_name] = n
+    end
+  end
+
+  opts.on("-e", "--executable EXECUTABLE", "Executable name.") do |e|
+    executable_path = "./pythia_programs/#{e}"
+    if valid_executable?(e)
+      options[:executable_name] = executable_path
+    else
+      puts "Error: Executable '#{e}' does not exist in './pythia_programs'."
+      exit
+    end
+  end
+
+  opts.on("-r", "--runcard RUNCARD", "RunCard name (default: './runcards/stringSpinSim.card').") do |r|
+    if valid_path?(r)
+      options[:run_card] = r
+    else
+      puts "Error: RunCard '#{r}' does not exist."
+      exit
+    end
+  end
+
+  opts.on("-c", "--events COUNT", Integer, "Number of events (default: 1000).") do |c|
+    options[:events] = c
+  end
+
+  opts.on("-o", "--output-dir DIR", "Output directory (default: './out/').") do |o|
+    if valid_path?(o)
+      options[:output_dir] = o
+    else
+      puts "Error: Output directory '#{o}' does not exist."
+      exit
+    end
+  end
+
+  opts.on("-p", "--process-macros MACROS", "Process macros.") do |p|
+    options[:process_macros] = p
+  end
+
+  opts.on("-b", "--num-batches BATCHES", Integer, "Number of batches for parallel processing (default: 1).") do |b|
+    options[:num_batches] = b
+  end
+
   opts.on_tail("-h", "--help", "Show this message") do
     puts opts
+    puts "\nMandatory parameters:"
+    puts "  -n, --name NAME: Project name (cannot be empty)."
+    puts "  -e, --executable EXECUTABLE: Executable name (must exist in './pythia_programs')."
+    puts "\nDefault values:"
+    puts "  -r, --runcard RUNCARD: './runcards/stringSpinSim.card'"
+    puts "  -c, --events COUNT: 1000"
+    puts "  -o, --output-dir DIR: './out/'"
+    puts "  -b, --num-batches BATCHES: 1"
+    puts "\nAvailable executables in './pythia_programs':"
+    Dir.foreach('./pythia_programs') do |file|
+      puts "  #{file}" if File.file?("./pythia_programs/#{file}")
+    end
     exit
   end
 end.parse!
+
+# Check mandatory options
+unless options[:project_name]
+  puts "Error: Project name (-n) is mandatory."
+  exit
+end
+
+unless options[:executable_name]
+  puts "Error: Executable (-e) is mandatory."
+  exit
+end
 
 
 project_dir = "#{options[:output_dir]}/#{options[:project_name]}"
@@ -138,7 +208,8 @@ final_slurm_script = <<-SLURM
 hadd -f #{project_dir}/analysis.root #{project_dir}/batch*.root
 
 # Remove all .root files apart from the first one, just to save it
-find #{project_dir} -name "batch*.root" | grep -v "batch0_*.root" | xargs rm -f
+find #{project_dir} -type f -name "batch*.root" | grep -vE "^#{project_dir}/batch0_.*\.root$" | xargs rm -f
+
 
 SLURM
 
