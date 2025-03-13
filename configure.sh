@@ -32,5 +32,15 @@ echo_blue "Configuring StringSpinner..."
 echo_blue "Storing \$STRINGSPINNERDIR=${PWD}/deps/stringspinner in Makefile.inc"
 echo "STRINGSPINNERDIR=${PWD}/deps/stringspinner" >> Makefile.inc
 
+# Check if PYTHIA8DATA is set correctly
+expected_path="$pythia_path/share/Pythia8/xmldoc"
+if [ "$PYTHIA8DATA" != "$expected_path" ]; then
+    echo_blue "Warning: \$PYTHIA8DATA is not set correctly."
+    echo "Please add the following line to your .bashrc or .cshrc:"
+    echo "export PYTHIA8DATA=${expected_path}"
+else
+    echo_blue "PYTHIA8DATA is correctly set."
+fi
+
 # Exit
 echo_blue "All done."
