@@ -20,6 +20,8 @@ git clone --recurse-submodules https://github.com/Gregtom3/spinthyia.git
 ./configure.sh /path/to/pythia/installation
 ```
 
+You may be prompted to edit your `PYTHIA8DATA` path. If so, you must update this environment variable, ideally in your `.cshrc` or `.bashrc.`
+
 5. The scripts responsible for running the PYTHIA MC Eventgen are located in `./spinthyia/pythia_programs` and have a `.cc` extension. The Makefile included in this repository compiles these scripts using `ROOT`, `PYTHIA8`, and `StringSpinner` dependencies. To compile all files...
 
 ```
